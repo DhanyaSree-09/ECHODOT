@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Braille Website</title>
+  <link rel="stylesheet" href="1.css" />
+</head>
+<body>
+  <!-- Background Video -->
+  <video autoplay muted loop id="bg-video">
+    <source src="video.mp4" type="video/mp4" />
+  
+  </video>
+  <div class="video-overlay"></div>
+
+
+  <!-- Main Content -->
+  <main>
+    <section class="hero">
+      <div class="braille">Echodot</div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section">
+      <div class="about">ABOUT</div>
+      <p class="about-text">
+        This project converts plain text into Braille images and recognizes Braille images to produce spoken output. It bridges digital and tactile communication by providing text-to-Braille rendering and Braille-to-speech recognition, helping visually impaired users access written content and interact more independently.
+      </p>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+      <div class="features">FEATURES</div>
+      <button class="learn-more" onclick="location.href='f.html'">Learn More</button>
+    </section>
+  </main>
+
+  <!-- Scroll Animation Script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+          }
+        });
+      }, {
+        threshold: 0.3
+      });
+
+      const elementsToObserve = document.querySelectorAll('.features, .about');
+      elementsToObserve.forEach(el => observer.observe(el));
+    });
+  </script>
+</body>
+</html>

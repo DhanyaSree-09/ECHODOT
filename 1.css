@@ -1,0 +1,208 @@
+/* General Styling */
+body {
+  margin: 0;
+  font-family: 'Helvetica Neue', sans-serif;
+  background: #000000;
+  color: #ffffff;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* Background Video */
+#bg-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Navigation */
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  background-color: rgba(10, 10, 10, 0.7);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+nav button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: white;
+  border-radius: 20px;
+  border-width: 5px;
+  border-color: aliceblue;
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-block;
+  box-shadow: 0 0 5px rgba(179, 179, 179, 0.2);
+}
+
+nav button:hover {
+  background-color: white;
+  color: black;
+  border: 1px solid black;
+}
+
+/* --------------------------------------- */
+/* 1. HERO SECTION (Echo Dot) */
+/* --------------------------------------- */
+
+.hero {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  animation: fadeIn 1s ease-in-out forwards;
+}
+
+.hero .braille {
+  font-size: 5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(50px);
+  animation: popUp 1s ease-in-out forwards;
+  z-index: 1;
+}
+
+/* --------------------------------------- */
+/* 2. ABOUT SECTION */
+/* --------------------------------------- */
+
+.about-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Helvetica Neue', sans-serif;
+  min-height: 90vh;
+  background: linear-gradient(to bottom, #0c0c0c, #171616); /* black → gray */
+  color: #ffffff;
+
+  padding: 2rem;
+  text-align: center;
+}
+
+.about {
+  font-size: 4.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(50px);
+  animation: popUp 1s ease-in-out forwards;
+  animation-delay: 0.5s;
+}
+
+.about-text {
+  max-width: 900px;
+  font-size: 1.3rem;
+  line-height: 1.8;
+  padding: 1rem;
+  opacity: 0;
+  animation: fadeIn 1.5s ease-in-out forwards;
+  animation-delay: 1.2s;
+}
+
+.about.show,
+.about-text.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --------------------------------------- */
+/* 3. FEATURES SECTION */
+/* --------------------------------------- */
+
+.features-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Helvetica Neue', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #171616, #000000); /* gray → black */
+  color: #ffffff;
+
+  transition: background 1s ease-in-out;
+  padding: 2rem;
+}
+
+.features {
+  font-size: 5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(50px);
+  animation: popUp 1s ease-in-out forwards;
+  z-index: 1;
+  font-family: 'Helvetica Neue', sans-serif;
+  animation-delay: 1s;
+}
+
+.features.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.learn-more {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-block;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.learn-more:hover {
+  background-color: #000;
+  color: #fff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+  transform: translateY(-3px);
+}
+
+/* --------------------------------------- */
+/* Animations */
+/* --------------------------------------- */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

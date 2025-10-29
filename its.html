@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Braille Image to Speech</title>
+<style>
+  /* General Styling */
+  body {
+    margin: 0;
+    font-family: 'Helvetica Neue', sans-serif;
+    background: #000000;
+    color: #ffffff;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 600px;
+    width: 100%;
+    background: linear-gradient(to bottom, #000000, #141313, #282828);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 8px 15px rgba(255, 255, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h2 {
+    font-size: 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    animation: popUp 1s ease-in-out forwards;
+  }
+
+  #imageInput {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 1rem;
+    border-radius: 12px;
+    border: none;
+    margin-bottom: 1rem;
+    outline: none;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+    background-color: #222;
+    color: white;
+    cursor: pointer;
+  }
+
+  #decodeBtn {
+    padding: 12px 30px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #000;
+    background: #f7f7f7;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.5);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    margin-bottom: 1rem;
+    user-select: none;
+  }
+
+  #decodeBtn:hover {
+    background-color: #000;
+  color: #fff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+  transform: translateY(-3px);
+}
+  
+
+  #decodeBtn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.959);
+  }
+
+  #resultText {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-top: 1rem;
+    text-align: center;
+    min-height: 3rem;
+  }
+
+  canvas {
+    display: none;
+  }
+
+  @keyframes popUp {
+    from {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h2>Braille Image to Speech</h2>
+    <input type="file" accept="image/*" id="imageInput" />
+    <button id="decodeBtn" disabled>Decode & Speak</button>
+    <div id="resultText"></div>
+    <canvas id="canvas"></canvas>
+  </div>
+
+<script>
+  // Braille mapping from letters to dot sets (dots numbered 1-6)
+  const LETTER_TO_DOTS = {
+    'A': new Set([1]), 'B': new Set([1, 2]), 'C': new Set([1, 4]), 'D': new Set([1, 4, 5]),
+    'E': new Set([1, 5]), 'F': new Set([1, 2, 4]), 'G': new Set([1, 2, 4, 5]), 'H': new Set([1, 2, 5]),
+    'I': new Set([2, 4]), 'J': new Set([2, 4, 5]), 'K': new Set([1, 3]), 'L': new Set([1, 2, 3]),
+    'M': new Set([1, 3, 4]), 'N': new Set([1, 3, 4, 5]), 'O': new Set([1, 3, 5]), 'P': new Set([1, 2, 3, 4]),
+    'Q': new Set([1, 2, 3, 4, 5]), 'R': new Set([1, 2, 3, 5]), 'S': new Set([2, 3, 4]), 'T': new Set([2, 3, 4, 5]),
+    'U': new Set([1, 3, 6]), 'V': new Set([1, 2, 3, 6]), 'W': new Set([2, 4, 5, 6]), 'X': new Set([1, 3, 4, 6]),
+    'Y': new Set([1, 3, 4, 5, 6]), 'Z': new Set([1, 3, 5, 6]), ' ': new Set(), ',': new Set([2]), '.': new Set([2, 5, 6])
+  };
+
+  // Reverse map from dot sets to letters for fast lookup
+  const DOTS_TO_LETTER = {};
+  for (const [letter, dots] of Object.entries(LETTER_TO_DOTS)) {
+    DOTS_TO_LETTER[[...dots].sort().join(',')] = letter;
+  }
+
+  const imageInput = document.getElementById('imageInput');
+  const decodeBtn = document.getElementById('decodeBtn');
+  const resultText = document.getElementById('resultText');
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  let uploadedImageFile = null;
+
+  imageInput.addEventListener('change', () => {
+    if (imageInput.files.length > 0) {
+      uploadedImageFile = imageInput.files[0];
+      decodeBtn.disabled = false;
+      resultText.textContent = '';
+    } else {
+      decodeBtn.disabled = true;
+      uploadedImageFile = null;
+      resultText.textContent = '';
+    }
+  });
+
+  decodeBtn.addEventListener('click', () => {
+    if (!uploadedImageFile) return;
+
+    decodeBtn.disabled = true;
+    resultText.textContent = "Decoding Braille image...";
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        // Set canvas size to image size
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // Draw image on canvas
+        ctx.drawImage(img, 0, 0);
+
+        // Get image data from canvas
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const pixels = imageData.data;
+
+        // Convert to grayscale & binary threshold
+        const threshold = 100; // same as python threshold
+        // Binary array: true = dot (black), false = no dot (white)
+        const binary = new Array(canvas.width * canvas.height);
+
+        for (let i = 0; i < pixels.length; i += 4) {
+          // grayscale = 0.299*R + 0.587*G + 0.114*B
+          const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+          const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+          binary[i / 4] = gray < threshold;
+        }
+
+        // Braille cell parameters (same as your python code)
+        const cellWidth = 40;
+        const cellHeight = 60;
+        const dotRadius = 7;
+        const padding = 10;
+        const numCells = Math.floor((canvas.width - 2 * padding) / cellWidth);
+
+        // Dot positions relative to cell top-left
+        const dotPositions = [
+          [cellWidth / 4, cellHeight / 6],        // Dot 1
+          [cellWidth / 4, cellHeight / 2],        // Dot 2
+          [cellWidth / 4, 5 * cellHeight / 6],    // Dot 3
+          [3 * cellWidth / 4, cellHeight / 6],    // Dot 4
+          [3 * cellWidth / 4, cellHeight / 2],    // Dot 5
+          [3 * cellWidth / 4, 5 * cellHeight / 6] // Dot 6
+        ];
+
+        function isDotPresent(cx, cy) {
+          const xStart = Math.max(0, Math.floor(cx - dotRadius));
+          const xEnd = Math.min(canvas.width - 1, Math.floor(cx + dotRadius));
+          const yStart = Math.max(0, Math.floor(cy - dotRadius));
+          const yEnd = Math.min(canvas.height - 1, Math.floor(cy + dotRadius));
+
+          for (let y = yStart; y <= yEnd; y++) {
+            for (let x = xStart; x <= xEnd; x++) {
+              if (binary[y * canvas.width + x]) {
+                return true;
+              }
+            }
+          }
+          return false;
+        }
+
+        let decodedLetters = [];
+
+        for (let cellIdx = 0; cellIdx < numCells; cellIdx++) {
+          const xCellStart = cellIdx * cellWidth + padding;
+          let dotsPresent = [];
+
+          dotPositions.forEach((pos, idx) => {
+            const dotX = xCellStart + pos[0];
+            const dotY = padding + pos[1];
+
+            if (isDotPresent(dotX, dotY)) {
+              dotsPresent.push(idx + 1);
+            }
+          });
+
+          dotsPresent.sort((a,b)=>a-b);
+          const key = dotsPresent.join(',');
+          decodedLetters.push(DOTS_TO_LETTER[key] || '?');
+        }
+
+const decodedText = decodedLetters.join('');
+const formattedText = formatSentence(decodedText);
+resultText.textContent = formattedText;
+speakText(formattedText);
+
+
+        decodeBtn.disabled = false;
+      };
+      img.onerror = () => {
+        resultText.textContent = "Failed to load image.";
+        decodeBtn.disabled = false;
+      };
+      img.src = event.target.result;
+    };
+
+    reader.onerror = () => {
+      resultText.textContent = "Failed to read image.";
+      decodeBtn.disabled = false;
+    };
+
+    reader.readAsDataURL(uploadedImageFile);
+  });
+function formatSentence(text) {
+  return text
+    .split('.')
+    .map(sentence => sentence.trim())
+    .filter(sentence => sentence.length > 0)
+    .map(sentence => sentence[0].toUpperCase() + sentence.slice(1).toLowerCase())
+    .join('. ') + (text.trim().endsWith('.') ? '.' : '');
+}
+  // Text-to-Speech using Web Speech API
+  function speakText(text) {
+    if (!text) return;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    window.speechSynthesis.speak(utterance);
+  }
+</script>
+</body>
+</html>

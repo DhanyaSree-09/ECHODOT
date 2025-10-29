@@ -1,0 +1,119 @@
+body {
+  margin: 0;
+  font-family: 'Helvetica Neue', sans-serif;
+  background: #000000;
+  color: #ffffff;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 600px;
+  width: 100%;
+  background: linear-gradient(to bottom, #000000, #141313, #282828);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 15px rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  animation: popUp 1s ease-in-out forwards;
+}
+
+#textInput {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1rem;
+  border-radius: 12px;
+  border: none;
+  margin-bottom: 1rem;
+  outline: none;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+  background-color: #222;
+  color: white;
+}
+
+#generateButton {
+  padding: 12px 30px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #000;
+  background: #f7f7f7;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.5);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  margin-bottom: 1rem;
+  user-select: none;
+}
+
+#generateButton:hover {
+   background-color: #000;
+  color: #fff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+  transform: translateY(-3px);
+}
+
+#generateButton:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.959);
+}
+
+#downloadLink {
+  padding: 12px 30px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #000;
+  background: #f7f7f7;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.5);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease, color 0.3s ease;
+  text-decoration: none;
+  user-select: none;
+  display: inline-block;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+#downloadLink:hover {
+  background-color: #000;
+  color: #fff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+  transform: translateY(-3px);
+}
+
+#downloadLink:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.959);
+}
+
+
+canvas {
+  display: none;
+}
+
+@keyframes popUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
